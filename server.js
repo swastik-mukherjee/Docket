@@ -1,11 +1,24 @@
 const { urlencoded } = require("express");
 const express = require("express");
+const mongodb = require("mongodb");
+
 
 const app = express();
+let db
+
+let connectionString = 'mongodb+srv://docketer:1144@cluster0.ett0z.mongodb.net/DocketApp?retryWrites=true&w=majority';
+mongodb.connect(connectionString, { useNewUrlParser: true }, (err, client) => {
+  db = client.db();
+  app.listen(5000, () => {
+    console.log("The server is listenig at port 5000")
+  });
+});
+
+
 
 app.use(urlencoded({ extended: true }));
 app.get('/', (req, res) => {
-    res.send(`<!DOCTYPE html>
+  res.send(`<!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
@@ -57,11 +70,10 @@ app.get('/', (req, res) => {
 });
 
 app.post('/create-item', (req, res) => {
-    console.log(req.body.item);
+  db.collection('items').insertOne({ text: req.body.item }, () => {
     res.send("Thanks!!");
+  });
 });
 
 
-app.listen(5000, () => {
-    console.log("The server is listenig at port 5000")
-});
+
